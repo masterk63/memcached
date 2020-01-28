@@ -33,19 +33,19 @@ const get = command => {};
 
 const gets = command => {};
 
-const set = command => {};
+const set = (command, value) => {};
 
-const add = command => {};
+const add = (command, value) => {};
 
-const replace = command => {};
+const replace = (command, value) => {};
 
-const append = command => {};
+const append = (command, value) => {};
 
-const prepend = command => {};
+const prepend = (command, value) => {};
 
-const cas = command => {};
+const cas = (command, value) => {};
 
-const runCommand = command => {
+const runCommand = (command, value) => {
   const commandName = command[0];
   switch (commandName) {
     case GET:
@@ -55,22 +55,22 @@ const runCommand = command => {
       gets(command);
       break;
     case SET:
-      set(command);
+      set(command, value);
       break;
     case ADD:
-      add(command);
+      add(command, value);
       break;
     case REPLACE:
-      replace(command);
+      replace(command, value);
       break;
     case APPEND:
-      append(command);
+      append(command, value);
       break;
     case PREPREND:
-      prepend(command);
+      prepend(command, value);
       break;
     case CAS:
-      cas(command);
+      cas(command, value);
       break;
     default:
       break;

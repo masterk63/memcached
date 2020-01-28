@@ -23,7 +23,7 @@ const read = data => {
         }
       }
     } else {
-      const value = parseCommand();
+      const value = parseCommand()[0];
       runCommand(addCommand, value);
       addCommand= '';
     }
