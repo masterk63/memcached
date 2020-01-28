@@ -9,7 +9,7 @@ client.on('data', function(data) {
 	const reponse = data.toString('utf8');
 	if(reponse !== '\r\n') {
 		console.log(reponse);
-		client.destroy();
+		client.end();
 	}
 });
 
