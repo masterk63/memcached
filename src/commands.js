@@ -1,4 +1,4 @@
-const { commandNotFound, clientError } = require('./socket');
+const { commandNotFound, badCommandLineFormat, storedMessage } = require('./socket');
 const GET = 'get';
 const GETS = 'gets';
 const SET = 'set';
@@ -8,32 +8,43 @@ const APPEND = 'append';
 const PREPREND = 'prepend';
 const CAS = 'cas';
 const commandNames = [GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS];
-const getCommands = [GET, GETS];
+const retrievalCommand = [GET, GETS];
 const commandCasLength = 6;
 const commandsAddLength = 5;
 const commandsGetLength = 2;
+const maxValueUnsigned16bit = 65535;
 
-const isGetCommand = command => getCommands.includes(command);
+const isRetrievalCommand = command => retrievalCommand.includes(command);
+
+const checkStoreCommand = command => {
+  let [_, key, flag, exptime, bytes] = command;
+  if(key === '') return commandNotFound();
+  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return badCommandLineFormat();
+  flag = parseInt(flag);
+  exptime = parseInt(exptime);
+  bytes = parseInt(bytes);
+  if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return badCommandLineFormat();
+  return true;
+};
 
 const isValidCommand = fullCommand => {
   const commandName = fullCommand[0];
   if (commandNames.includes(commandName)) {
     if (commandName === CAS && fullCommand.length === commandCasLength) return true;
-    if (isGetCommand(commandName) && fullCommand.length === commandsGetLength) return true;
-    if (fullCommand.length === commandsAddLength) return true;
-    clientError('length error');
-    return false;
-  } else {
-    commandNotFound();
-    return false;
+    if (isRetrievalCommand(commandName) && fullCommand.length === commandsGetLength) return true;
+    if (fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand);
   }
+  return commandNotFound();
 };
 
 const get = command => {};
 
 const gets = command => {};
 
-const set = (command, value) => {};
+const set = (command, value) => {
+  console.log('estyo');
+  storedMessage();
+};
 
 const add = (command, value) => {};
 
@@ -79,4 +90,4 @@ const runCommand = (command, value) => {
   }
 };
 
-module.exports = { isValidCommand, runCommand, isGetCommand, deleteKey };
+module.exports = { isValidCommand, runCommand, isRetrievalCommand, deleteKey };
