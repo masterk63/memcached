@@ -45,6 +45,8 @@ const prepend = (command, value) => {};
 
 const cas = (command, value) => {};
 
+const deleteKey = key => {};
+
 const runCommand = (command, value) => {
   const commandName = command[0];
   switch (commandName) {
@@ -77,4 +79,4 @@ const runCommand = (command, value) => {
   }
 };
 
-module.exports = { isValidCommand, runCommand, isGetCommand };
+module.exports = { isValidCommand, runCommand, isGetCommand, deleteKey };
