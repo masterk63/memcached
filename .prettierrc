@@ -1,0 +1,11 @@
+{
+  "tabWidth": 2,
+  "semi": true,
+  "trailingCommas": {
+    "array": true,
+    "object": true, 
+    "function": false 
+  },
+	"singleQuote": true,
+	"printWidth": 100
+}
