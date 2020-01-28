@@ -1,0 +1,26 @@
+{
+  "name": "memcached",
+  "version": "1.0.0",
+  "description": "memcached server developed in nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "yarn test",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masterk63/memcached.git"
+  },
+  "keywords": [
+    "memcached"
+  ],
+  "author": "Gomez Veliz, Kevin Shionen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/masterk63/memcached/issues"
+  },
+  "homepage": "https://github.com/masterk63/memcached#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
