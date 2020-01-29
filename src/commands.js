@@ -1,31 +1,21 @@
 const { commandNotFound, badCommandLineFormat, storedMessage, badDataChunk } = require('./socket');
+const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
-const GET = 'get';
-const GETS = 'gets';
-const SET = 'set';
-const ADD = 'add';
-const REPLACE = 'replace';
-const APPEND = 'append';
-const PREPREND = 'prepend';
-const CAS = 'cas';
-const commandNames = [GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS];
-const retrievalCommand = [GET, GETS];
-const commandCasLength = 6;
-const commandsAddLength = 5;
-const commandsGetLength = 2;
-const maxValueUnsigned16bit = 65535;
+const LogUser = require('./models/LogUser');
+const { createKey, deleteKeyCache } = require('./memcached');
+
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
 const parseCommandValues = command => {
-  let [commandName, key, flag, exptime, bytes] = command;
+  let [_, key, flag, exptime, bytes] = command;
   flag = parseInt(flag);
   exptime = parseInt(exptime);
   bytes = parseInt(bytes);
-  return [commandName, key, flag, exptime, bytes];
+  return [key, flag, exptime, bytes];
 };
 
 const checkStoreCommand = command => {
-  let [_, key, flag, exptime, bytes] = parseCommandValues(command);
+  let [key, flag, exptime, bytes] = parseCommandValues(command);
   if (key === '') return commandNotFound();
   if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return badCommandLineFormat();
   if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return badCommandLineFormat();
@@ -47,11 +37,12 @@ const get = command => {};
 const gets = command => {};
 
 const set = (command, value) => {
-  let [commandName, key, flag, exptime, bytes] = parseCommandValues(command);  
+  let [key, flag, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return badDataChunk();
   const data = new Data(key, flag, exptime, value);
-  console.log(data);
-
+  const logUser = new LogUser();
+  data.updateLog.push(logUser);
+  createKey(data);
   storedMessage();
 };
 
@@ -65,7 +56,7 @@ const prepend = (command, value) => {};
 
 const cas = (command, value) => {};
 
-const deleteKey = key => {};
+const deleteKey = key => deleteKeyCache(key);
 
 const runCommand = (command, value) => {
   const commandName = command[0];

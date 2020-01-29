@@ -3,6 +3,7 @@ const SECOND = 1000;
 
 module.exports = class Data {
   constructor(key, flags, exptime, value) {
+    this.key = key;
     this.value = value;
     this.flags = flags;
     this.fetchLog = [];

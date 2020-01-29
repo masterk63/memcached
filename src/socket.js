@@ -28,9 +28,12 @@ const badDataChunk = () => {
 
 const storedMessage = () => writeMessage('STORED');
 
+const getCurrentUser = () => socket.remoteAddress;
+
 module.exports = {
   initSocket,
-  writeMessage,
+	getCurrentUser,
+	writeMessage,
   commandNotFound,
 	clientError,
 	storedMessage,

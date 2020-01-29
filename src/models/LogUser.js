@@ -1,6 +1,8 @@
+const { getCurrentUser } = require('../socket');
+
 module.exports = class LogUser {
-  constructor(user) {
-    this.user = user;
-    this.time = Date.now()
+  constructor() {
+    this.user = getCurrentUser();
+    this.time = Date.now();
   }
-}
+};
