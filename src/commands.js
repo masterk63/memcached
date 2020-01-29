@@ -2,7 +2,7 @@ const { commandNotFound, badCommandLineFormat, storedMessage, badDataChunk } = r
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
 const LogUser = require('./models/LogUser');
-const { createKey, deleteKeyCache } = require('./memcached');
+const { createKey, deleteKeyCache, isKeyStored } = require('./memcached');
 
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
@@ -36,6 +36,7 @@ const get = command => {};
 
 const gets = command => {};
 
+//store this data
 const set = (command, value) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return badDataChunk();
@@ -46,7 +47,13 @@ const set = (command, value) => {
   storedMessage();
 };
 
-const add = (command, value) => {};
+// store this data, but only if the server *doesn't* already
+// hold data for this key
+const add = (command, value) => {
+  const key = command[1];
+  if(isKeyStored(key)) return false;
+  set(command, value);
+};
 
 const replace = (command, value) => {};
 
