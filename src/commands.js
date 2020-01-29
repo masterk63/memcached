@@ -36,7 +36,11 @@ const get = (values, showCas = false) => {
   values.shift();
   values.forEach(value => {
     const storedValue = readKey(value);
-    if(storedValue) getValueMessage({ ...storedValue, showCas });
+    if(storedValue) {
+      const logUser = new LogUser();
+      storedValue.fetchLog.push(logUser);
+      getValueMessage({ ...storedValue, showCas });
+    }
   });
   endMessage();
 };
