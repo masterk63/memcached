@@ -10,7 +10,7 @@ const commandNames = [GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS];
 const retrievalCommand = [GET, GETS];
 const commandCasLength = 6;
 const commandsAddLength = 5;
-const commandsGetLength = 2;
+const commandsGetLength = 1;
 const maxValueUnsigned16bit = 65535;
 
 module.exports = {

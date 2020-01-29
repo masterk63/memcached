@@ -4,7 +4,7 @@ const getMemcachedInstance = () => cache;
 
 const createKey = data => cache[data.key] = data;
 
-const readKey = () => {};
+const readKey = key => cache[key];
 
 const updateKey = () => {};
 

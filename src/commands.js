@@ -1,8 +1,8 @@
-const { commandNotFound, badCommandLineFormat, storedMessage, badDataChunk } = require('./socket');
+const { commandNotFound, badCommandLineFormat, storedMessage, notStoredMessage, badDataChunk, getValueMessage, endMessage } = require('./socket');
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
 const LogUser = require('./models/LogUser');
-const { createKey, deleteKeyCache, isKeyStored } = require('./memcached');
+const { createKey, deleteKeyCache, isKeyStored, readKey } = require('./memcached');
 
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
@@ -26,20 +26,28 @@ const isValidCommand = fullCommand => {
   const commandName = fullCommand[0];
   if (commandNames.includes(commandName)) {
     if (commandName === CAS && fullCommand.length === commandCasLength) return true;
-    if (isRetrievalCommand(commandName) && fullCommand.length === commandsGetLength) return true;
+    if (isRetrievalCommand(commandName) && fullCommand.length > commandsGetLength) return true;
     if (fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand);
   }
   return commandNotFound();
 };
 
-const get = command => {};
+const get = (values, showCas = false) => {
+  values.shift();
+  values.forEach(value => {
+    const storedValue = readKey(value);
+    if(storedValue) getValueMessage({ ...storedValue, showCas });
+  });
+  endMessage();
+};
 
-const gets = command => {};
+const gets = values => get(values, true);
 
 //store this data
 const set = (command, value) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return badDataChunk();
+  if(exptime < 0) return storedMessage();
   const data = new Data(key, flag, exptime, value);
   const logUser = new LogUser();
   data.updateLog.push(logUser);
@@ -51,11 +59,15 @@ const set = (command, value) => {
 // hold data for this key
 const add = (command, value) => {
   const key = command[1];
-  if(isKeyStored(key)) return false;
+  if(isKeyStored(key)) return notStoredMessage();
   set(command, value);
 };
 
-const replace = (command, value) => {};
+const replace = (command, value) => {
+  const key = command[1];
+  if(!isKeyStored(key)) return notStoredMessage();
+  set(command, value);
+};
 
 const append = (command, value) => {};
 
