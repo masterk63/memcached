@@ -1,18 +1,19 @@
-var net = require('net');
-var client = net.connect({ port: 4444 }, function() {
-  console.log('connected to server!');
-	client.write('set foo 3 3 3\r\n');
-	client.write('hola\r\n');
-});
+const net = require('net');
 
-client.on('data', function(data) {
-	const reponse = data.toString('utf8');
-	if(reponse !== '\r\n') {
-		console.log(reponse);
-		client.end();
-	}
-});
+const clientTest = fn => {
+  const client = net.connect({ port: 4444 });
+  client.on('data', function(data) {
+    const reponse = data.toString('utf8');
+    if (reponse !== '\r\n') {
+			fn(reponse);
+      client.end();
+    }
+	});
+	return client;
+};
 
-client.on('end', function() {
-  console.log('disconnected from server');
+const client = clientTest(data => {
+	console.log('showing', data);
 });
+client.write('set foo 3 3 3\r\n');
+client.write('hol\r\n');

@@ -1,4 +1,5 @@
-const { commandNotFound, badCommandLineFormat, storedMessage } = require('./socket');
+const { commandNotFound, badCommandLineFormat, storedMessage, badDataChunk } = require('./socket');
+const Data = require('./models/Data');
 const GET = 'get';
 const GETS = 'gets';
 const SET = 'set';
@@ -13,16 +14,20 @@ const commandCasLength = 6;
 const commandsAddLength = 5;
 const commandsGetLength = 2;
 const maxValueUnsigned16bit = 65535;
-
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
-const checkStoreCommand = command => {
-  let [_, key, flag, exptime, bytes] = command;
-  if(key === '') return commandNotFound();
-  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return badCommandLineFormat();
+const parseCommandValues = command => {
+  let [commandName, key, flag, exptime, bytes] = command;
   flag = parseInt(flag);
   exptime = parseInt(exptime);
   bytes = parseInt(bytes);
+  return [commandName, key, flag, exptime, bytes];
+};
+
+const checkStoreCommand = command => {
+  let [_, key, flag, exptime, bytes] = parseCommandValues(command);
+  if (key === '') return commandNotFound();
+  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return badCommandLineFormat();
   if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return badCommandLineFormat();
   return true;
 };
@@ -42,7 +47,11 @@ const get = command => {};
 const gets = command => {};
 
 const set = (command, value) => {
-  console.log('estyo');
+  let [commandName, key, flag, exptime, bytes] = parseCommandValues(command);
+  if (value.length !== bytes) return badDataChunk();
+  const data = new Data(key, flag, exptime, value);
+  console.log(data);
+
   storedMessage();
 };
 
