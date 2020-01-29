@@ -28,7 +28,10 @@ const badDataChunk = () => {
 
 const storedMessage = () => writeMessage('STORED');
 
-const notStoredMessage = () => writeMessage('NOT_STORED');
+const notStoredMessage = () => {
+	writeMessage('NOT_STORED');
+	return false;
+}
 
 const endMessage = () => writeMessage('END');
 

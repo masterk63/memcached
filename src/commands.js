@@ -2,7 +2,7 @@ const { commandNotFound, badCommandLineFormat, storedMessage, notStoredMessage, 
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
 const LogUser = require('./models/LogUser');
-const { createKey, deleteKeyCache, isKeyStored, readKey } = require('./memcached');
+const { createKey, deleteKeyCache, isKeyStored, readKey, updateKey } = require('./memcached');
 
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
@@ -69,9 +69,21 @@ const replace = (command, value) => {
   set(command, value);
 };
 
-const append = (command, value) => {};
+const appendLogic = isAppend  => (command, value) => {
+  let [key, _, __, bytes] = parseCommandValues(command);
+  if (value.length !== bytes) return badDataChunk();
+  if(!isKeyStored(key)) return notStoredMessage();
+  const data = { ...readKey(key) };
+  data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
+  const logUser = new LogUser();
+  data.updateLog.push(logUser);
+  updateKey(data);
+  storedMessage();
+};
 
-const prepend = (command, value) => {};
+const append = appendLogic(true);
+
+const prepend = appendLogic(false);
 
 const cas = (command, value) => {};
 

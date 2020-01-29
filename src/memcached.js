@@ -6,7 +6,7 @@ const createKey = data => cache[data.key] = data;
 
 const readKey = key => cache[key];
 
-const updateKey = () => {};
+const updateKey = data => cache[data.key] = data;
 
 const deleteKeyCache = key => delete cache[key];
 

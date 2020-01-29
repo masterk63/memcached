@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
+    "start:debug": "nodemon --inspect index.js",
     "start": "nodemon index.js"
   },
   "repository": {
