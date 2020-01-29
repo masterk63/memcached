@@ -47,7 +47,7 @@ const get = command => {};
 const gets = command => {};
 
 const set = (command, value) => {
-  let [commandName, key, flag, exptime, bytes] = parseCommandValues(command);
+  let [commandName, key, flag, exptime, bytes] = parseCommandValues(command);  
   if (value.length !== bytes) return badDataChunk();
   const data = new Data(key, flag, exptime, value);
   console.log(data);
