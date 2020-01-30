@@ -27,7 +27,7 @@ const isValidCommand = (fullCommand, socket) => {
   if (commandNames.includes(commandName)) {
     if (commandName === CAS && fullCommand.length === commandCasLength) return true;
     if (isRetrievalCommand(commandName) && fullCommand.length > commandsGetLength) return true;
-    if (fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand, socket);
+    if (commandName !== CAS && fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand, socket);
   }
   return socket.commandNotFound();
 };
@@ -89,7 +89,10 @@ const append = appendLogic(true);
 
 const prepend = appendLogic(false);
 
-const cas = (command, value, socket) => {};
+const cas = (command, value, socket) => {
+  console.log('estoy');
+  
+};
 
 const deleteKey = key => deleteKeyCache(key);
 
