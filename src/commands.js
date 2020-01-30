@@ -32,11 +32,18 @@ const isValidCommand = (fullCommand, socket) => {
   return socket.commandNotFound();
 };
 
+const getValueMessage = ({ key, flags, value, cas, showCas, socket }) => {
+  let message = `VALUE ${key} ${flags} ${value.length}`;
+  if (showCas) message += ` ${cas}`;
+  socket.writeMessage(message);
+  socket.writeMessage(`${value}`);
+}
+
 const get = (socket, values, showCas = false) => {
   values.shift();
   values.forEach(value => {
     const storedValue = readKey(value);
-    if(storedValue) socket.getValueMessage({ ...storedValue, showCas });
+    if(storedValue) getValueMessage({ ...storedValue, showCas, socket });
   });
   socket.endMessage();
 };

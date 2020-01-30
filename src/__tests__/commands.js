@@ -14,6 +14,13 @@ const mockData1 = {
   cas: 1
 };
 
+const mockData2 = {
+  key: 'name',
+  value: 'kevin',
+  flags: 0,
+  cas: 2
+};
+
 beforeEach(() => {
   Socket.mockClear();
 });
@@ -27,6 +34,21 @@ const appendLogic = command => {
   expect(socket.notStoredMessage).not.toHaveBeenCalled();
   expect(JSON.stringify(cache)).toMatchSnapshot();
   memcached.deleteKeyCache('foo');
+}
+
+const getLogicMulti = command => {
+  const socket = new Socket();
+  memcached.createKey(mockData1);
+  memcached.createKey(mockData2);
+  runCommand(socket, parseCommand(command));
+  expect(socket.endMessage).toHaveBeenCalledTimes(1);
+  expect(socket.writeMessage).toHaveBeenCalledTimes(4);
+  expect(socket.writeMessage).toHaveBeenCalledWith('VALUE foo 0 3');
+  expect(socket.writeMessage).toHaveBeenCalledWith('say');
+  expect(socket.writeMessage).toHaveBeenCalledWith('VALUE name 0 5');
+  expect(socket.writeMessage).toHaveBeenCalledWith('kevin');
+  memcached.deleteKeyCache('foo');
+  memcached.deleteKeyCache('name');
 }
 
 describe('Store Commands', () => {
@@ -155,6 +177,42 @@ describe('Store Commands', () => {
     expect(socket.writeMessage).not.toHaveBeenCalled();
     expect(socket.storedMessage).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(cache)).toMatchSnapshot();
+    memcached.deleteKeyCache('foo');
+  });
+  test('Get command key not found', () => {
+    const socket = new Socket();
+    const command = 'get hola';
+    runCommand(socket, parseCommand(command));
+    expect(socket.endMessage).toHaveBeenCalledTimes(1);
+  });
+  test('Get command ran successfully with 1 param', () => {
+    const socket = new Socket();
+    const command = 'get foo';
+    memcached.createKey(mockData1);
+    runCommand(socket, parseCommand(command));
+    expect(socket.endMessage).toHaveBeenCalledTimes(1);
+    expect(socket.writeMessage).toHaveBeenCalledTimes(2);
+    expect(socket.writeMessage).toHaveBeenCalledWith('VALUE foo 0 3');
+    expect(socket.writeMessage).toHaveBeenCalledWith('say');
+    memcached.deleteKeyCache('foo');
+  });
+  test('Get command ran successfully with 2 param', () => {
+    const command = 'get foo name';
+    getLogicMulti(command);
+  });
+  test('Get command ran with 3 param and 1 miss', () => {
+    const command = 'get foo name notstored';
+    getLogicMulti(command);
+  });
+  test('Gets command ran successfully with 1 param', () => {
+    const socket = new Socket();
+    const command = 'gets foo';
+    memcached.createKey(mockData1);
+    runCommand(socket, parseCommand(command));
+    expect(socket.endMessage).toHaveBeenCalledTimes(1);
+    expect(socket.writeMessage).toHaveBeenCalledTimes(2);
+    expect(socket.writeMessage).toHaveBeenCalledWith('VALUE foo 0 3 1');
+    expect(socket.writeMessage).toHaveBeenCalledWith('say');
     memcached.deleteKeyCache('foo');
   });
 });

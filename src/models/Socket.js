@@ -49,13 +49,6 @@ class Socket {
     this.writeMessage('END');
   }
 
-  getValueMessage({ key, flags, value, cas, showCas }) {
-    let message = `VALUE ${key} ${flags} ${value.length}`;
-    if (showCas) message += ` ${cas}`;
-    this.writeMessage(message);
-    this.writeMessage(`${value}`);
-  }
-
   getCurrentUser() {
     return `${this.socket.remoteAddress}:${this.socket.remotePort}`;
   }
