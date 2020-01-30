@@ -1,3 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Store Commands Set command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":1,\\"fetchLog\\":[],\\"updateLog\\":[{\\"time\\":1580414508505}]}}"`;
+exports[`Store Commands Add command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":2,\\"fetchLog\\":[],\\"updateLog\\":[{\\"time\\":1580415984747}]}}"`;
+
+exports[`Store Commands Replace command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"bye\\",\\"flags\\":3,\\"cas\\":3,\\"fetchLog\\":[],\\"updateLog\\":[{\\"time\\":1580415984750}]}}"`;
+
+exports[`Store Commands Set command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":1,\\"fetchLog\\":[],\\"updateLog\\":[{\\"time\\":1580415984742}]}}"`;
