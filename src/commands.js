@@ -1,7 +1,8 @@
 //@ts-check
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
-const Data = require('./models/Data');
 const { createKey, deleteKeyCache, isKeyStored, readKey, updateKey } = require('./memcached');
+const { getIncrementCas } = require('./cas');
+const Data = require('./models/Data');
 
 const isRetrievalCommand = command => retrievalCommand.includes(command);
 
@@ -72,6 +73,7 @@ const appendLogic = isAppend  => (command, value, socket) => {
   if(!isKeyStored(key)) return socket.notStoredMessage();
   const data = { ...readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
+  data.cas = getIncrementCas();
   updateKey(data);
   socket.storedMessage();
 };
@@ -81,8 +83,12 @@ const append = appendLogic(true);
 const prepend = appendLogic(false);
 
 const cas = (command, value, socket) => {
-  console.log('estoy');
-  
+  const key = command[1];
+  const userCas = parseInt(command[5]);
+  if(!isKeyStored(key)) return socket.writeMessage('NOT_FOUND');
+  const data = readKey(key);
+  if(data.cas !== userCas) return socket.writeMessage('EXISTS');
+  set(command, value, socket);
 };
 
 const deleteKey = key => deleteKeyCache(key);
