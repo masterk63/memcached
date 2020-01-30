@@ -1,7 +1,6 @@
 //@ts-check
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
-const LogUser = require('./models/LogUser');
 const { createKey, deleteKeyCache, isKeyStored, readKey, updateKey } = require('./memcached');
 
 const isRetrievalCommand = command => retrievalCommand.includes(command);
@@ -36,11 +35,7 @@ const get = (socket, values, showCas = false) => {
   values.shift();
   values.forEach(value => {
     const storedValue = readKey(value);
-    if(storedValue) {
-      const logUser = new LogUser(socket);
-      storedValue.fetchLog.push(logUser);
-      socket.getValueMessage({ ...storedValue, showCas });
-    }
+    if(storedValue) socket.getValueMessage({ ...storedValue, showCas });
   });
   socket.endMessage();
 };
@@ -53,8 +48,6 @@ const set = (command, value, socket) => {
   if (value.length !== bytes) return socket.badDataChunk();
   if(exptime < 0) return socket.storedMessage();
   const data = new Data(key, flag, exptime, value);
-  const logUser = new LogUser(socket);
-  data.updateLog.push(logUser);
   createKey(data);
   socket.storedMessage();
 };
@@ -79,8 +72,6 @@ const appendLogic = isAppend  => (command, value, socket) => {
   if(!isKeyStored(key)) return socket.notStoredMessage();
   const data = { ...readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
-  const logUser = new LogUser(socket);
-  data.updateLog.push(logUser);
   updateKey(data);
   socket.storedMessage();
 };

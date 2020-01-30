@@ -9,8 +9,6 @@ class Data {
     this.value = value;
     this.flags = flags;
     this.cas = casUnique;
-    this.fetchLog = [];
-    this.updateLog = [];
     //if exptime = 0 the key never expire
     if (exptime > 0) {
       setTimeout(() => {
