@@ -1,14 +1,14 @@
 const net = require('net');
-const { initSocket } = require('./src/socket');
+const Socket = require('./src/socket');
 const parser = require('./src/parser');
 const PORT = process.env.PORT || 11211;
 
-const handleSocket = socket => {
-  initSocket(socket);
-  console.log('====================================');
-  console.log(`|| Welcome ${socket.remoteAddress} to memcached ||`);
-  console.log('====================================');
-  socket.on('data', parser.read);
+const handleSocket = skt => {
+  const socket = new Socket(skt);
+  console.log('==========================================');
+  console.log(`|| Welcome ${socket.getCurrentUser()} to memcached ||`);
+  console.log('==========================================');
+  socket.getInstance().on('data', data => parser.read(data, socket));
 }
 
 const server = net.createServer(handleSocket);

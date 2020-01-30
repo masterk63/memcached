@@ -1,5 +1,4 @@
 const { isValidCommand, runCommand, isRetrievalCommand } = require('./commands');
-const { badDataChunk } = require('./socket');
 const LINE_BREAK = '\r\n';
 let textChunk = '';
 let addCommand = '';
@@ -12,14 +11,14 @@ const parseCommand = () =>
     .toLowerCase()
     .split(' ');
 
-const read = data => {  
+const read = (data, socket) => {  
   textChunk += data.toString('utf8');
   if (enterPressed()) {
     if (!addCommand) {
       const command = parseCommand();
-      if (isValidCommand(command)) {
+      if (isValidCommand(command, socket)) {
         if (isRetrievalCommand(command[0])) {
-          runCommand(command);
+          runCommand(socket, command);
         } else {
           addCommand = command;
         }
@@ -28,9 +27,9 @@ const read = data => {
       const command = parseCommand();
       if (command.length === 1) {
         const value = command[0];
-        runCommand(addCommand, value);
+        runCommand(socket, addCommand, value);
       } else {
-        badDataChunk();
+        socket.badDataChunk();
       }
       addCommand = '';
     }

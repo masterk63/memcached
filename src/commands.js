@@ -1,4 +1,4 @@
-const { commandNotFound, badCommandLineFormat, storedMessage, notStoredMessage, badDataChunk, getValueMessage, endMessage } = require('./socket');
+//@ts-check
 const { GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS, commandNames, retrievalCommand, commandCasLength, commandsAddLength, commandsGetLength, maxValueUnsigned16bit } = require('./constants/commands');
 const Data = require('./models/Data');
 const LogUser = require('./models/LogUser');
@@ -14,111 +14,111 @@ const parseCommandValues = command => {
   return [key, flag, exptime, bytes];
 };
 
-const checkStoreCommand = command => {
+const checkStoreCommand = (command, socket) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
-  if (key === '') return commandNotFound();
-  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return badCommandLineFormat();
-  if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return badCommandLineFormat();
+  if (key === '') return socket.commandNotFound();
+  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return socket.badCommandLineFormat();
+  if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return socket.badCommandLineFormat();
   return true;
 };
 
-const isValidCommand = fullCommand => {
+const isValidCommand = (fullCommand, socket) => {
   const commandName = fullCommand[0];
   if (commandNames.includes(commandName)) {
     if (commandName === CAS && fullCommand.length === commandCasLength) return true;
     if (isRetrievalCommand(commandName) && fullCommand.length > commandsGetLength) return true;
-    if (fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand);
+    if (fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand, socket);
   }
-  return commandNotFound();
+  return socket.commandNotFound();
 };
 
-const get = (values, showCas = false) => {
+const get = (socket, values, showCas = false) => {
   values.shift();
   values.forEach(value => {
     const storedValue = readKey(value);
     if(storedValue) {
-      const logUser = new LogUser();
+      const logUser = new LogUser(socket);
       storedValue.fetchLog.push(logUser);
-      getValueMessage({ ...storedValue, showCas });
+      socket.getValueMessage({ ...storedValue, showCas });
     }
   });
-  endMessage();
+  socket.endMessage();
 };
 
-const gets = values => get(values, true);
+const gets = (socket, values) => get(socket, values, true);
 
 //store this data
-const set = (command, value) => {
+const set = (command, value, socket) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
-  if (value.length !== bytes) return badDataChunk();
-  if(exptime < 0) return storedMessage();
+  if (value.length !== bytes) return socket.badDataChunk();
+  if(exptime < 0) return socket.storedMessage();
   const data = new Data(key, flag, exptime, value);
-  const logUser = new LogUser();
+  const logUser = new LogUser(socket);
   data.updateLog.push(logUser);
   createKey(data);
-  storedMessage();
+  socket.storedMessage();
 };
 
 // store this data, but only if the server *doesn't* already
 // hold data for this key
-const add = (command, value) => {
+const add = (command, value, socket) => {
   const key = command[1];
-  if(isKeyStored(key)) return notStoredMessage();
-  set(command, value);
+  if(isKeyStored(key)) return socket.notStoredMessage();
+  set(command, value, socket);
 };
 
-const replace = (command, value) => {
+const replace = (command, value, socket) => {
   const key = command[1];
-  if(!isKeyStored(key)) return notStoredMessage();
-  set(command, value);
+  if(!isKeyStored(key)) return socket.notStoredMessage();
+  set(command, value, socket);
 };
 
-const appendLogic = isAppend  => (command, value) => {
+const appendLogic = isAppend  => (command, value, socket) => {
   let [key, _, __, bytes] = parseCommandValues(command);
-  if (value.length !== bytes) return badDataChunk();
-  if(!isKeyStored(key)) return notStoredMessage();
+  if (value.length !== bytes) return socket.badDataChunk();
+  if(!isKeyStored(key)) return socket.notStoredMessage();
   const data = { ...readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
-  const logUser = new LogUser();
+  const logUser = new LogUser(socket);
   data.updateLog.push(logUser);
   updateKey(data);
-  storedMessage();
+  socket.storedMessage();
 };
 
 const append = appendLogic(true);
 
 const prepend = appendLogic(false);
 
-const cas = (command, value) => {};
+const cas = (command, value, socket) => {};
 
 const deleteKey = key => deleteKeyCache(key);
 
-const runCommand = (command, value) => {
+const runCommand = (socket, command, value) => {
   const commandName = command[0];
   switch (commandName) {
     case GET:
-      get(command);
+      get(socket, command);
       break;
     case GETS:
-      gets(command);
+      gets(socket, command);
       break;
     case SET:
-      set(command, value);
+      set(command, value, socket);
       break;
     case ADD:
-      add(command, value);
+      add(command, value, socket);
       break;
     case REPLACE:
-      replace(command, value);
+      replace(command, value, socket);
       break;
     case APPEND:
-      append(command, value);
+      append(command, value, socket);
       break;
     case PREPREND:
-      prepend(command, value);
+      prepend(command, value, socket);
       break;
     case CAS:
-      cas(command, value);
+      cas(command, value, socket);
       break;
     default:
       break;
