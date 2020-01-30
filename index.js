@@ -5,10 +5,10 @@ const PORT = process.env.PORT || 11211;
 
 const handleSocket = skt => {
   const socket = new Socket(skt);
-  console.log('==========================================');
-  console.log(`|| Welcome ${socket.getCurrentUser()} to memcached ||`);
-  console.log('==========================================');
   socket.getInstance().on('data', data => parser.read(data, socket));
+  socket.writeMessage('==========================================');
+  socket.writeMessage(`|| Welcome ${socket.getCurrentUser()} to memcached ||`);
+  socket.writeMessage('==========================================');
 }
 
 const server = net.createServer(handleSocket);
