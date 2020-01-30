@@ -1,5 +1,5 @@
 const net = require('net');
-const Socket = require('./src/socket');
+const Socket = require('./src/models/Socket');
 const parser = require('./src/parser');
 const PORT = process.env.PORT || 11211;
 
