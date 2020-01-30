@@ -10,15 +10,24 @@ const parseCommand = command => command.split(' ');
 const mockData1 = {
   key: 'foo',
   value: 'say',
-  flags: 3,
-  cas: 1,
-  fetchLog: [],
-  updateLog: []
+  flags: 0,
+  cas: 1
 };
 
 beforeEach(() => {
   Socket.mockClear();
 });
+
+const appendLogic = command => {
+  const socket = new Socket();
+  const value = 'bye';
+  memcached.createKey(mockData1);
+  runCommand(socket, parseCommand(command), value);
+  expect(socket.storedMessage).toHaveBeenCalledTimes(1);
+  expect(socket.notStoredMessage).not.toHaveBeenCalled();
+  expect(JSON.stringify(cache)).toMatchSnapshot();
+  memcached.deleteKeyCache('foo');
+}
 
 describe('Store Commands', () => {
   test('Set command bad chunk', () => {
@@ -88,5 +97,64 @@ describe('Store Commands', () => {
     expect(socket.notStoredMessage).toHaveBeenCalledTimes(1);
     expect(socket.storedMessage).not.toHaveBeenCalled();
     expect(memcached.isKeyStored('foo')).toBe(false);
+  });
+  test('Append command not stored', () => {
+    const socket = new Socket();
+    const command = 'append foo 3 3 3';
+    const value = 'bye';
+    runCommand(socket, parseCommand(command), value);
+    expect(socket.notStoredMessage).toHaveBeenCalledTimes(1);
+    expect(socket.storedMessage).not.toHaveBeenCalled();
+    expect(memcached.isKeyStored('foo')).toBe(false);
+  });
+  test('Append command bad data chunk', () => {
+    const socket = new Socket();
+    const command = 'append foo 3 3 3';
+    const value = 'byee';
+    runCommand(socket, parseCommand(command), value);
+    expect(socket.badDataChunk).toHaveBeenCalledTimes(1);
+    expect(socket.storedMessage).not.toHaveBeenCalled();
+    expect(memcached.isKeyStored('foo')).toBe(false);
+  });
+  test('Append command ran successfully', () => {
+    const command = 'append foo 3 3 3';
+    appendLogic(command);
+  });
+  test('Prepend command ran successfully', () => {
+    const command = 'prepend foo 3 3 3';
+    appendLogic(command);
+  });
+  test('Cas command not found', () => {
+    const socket = new Socket();
+    const command = 'cas foo 3 3 3 3';
+    const value = 'bye';
+    runCommand(socket, parseCommand(command), value);
+    expect(socket.writeMessage).toHaveBeenCalledTimes(1);
+    expect(socket.writeMessage).toHaveBeenCalledWith('NOT_FOUND');
+    expect(socket.storedMessage).not.toHaveBeenCalled();
+    expect(memcached.isKeyStored('foo')).toBe(false);
+  });
+  test('Cas command EXISTS', () => {
+    const socket = new Socket();
+    const command = 'cas foo 3 3 3 3';
+    const value = 'bye';
+    memcached.createKey(mockData1);
+    runCommand(socket, parseCommand(command), value);
+    expect(socket.writeMessage).toHaveBeenCalledTimes(1);
+    expect(socket.writeMessage).toHaveBeenCalledWith('EXISTS');
+    expect(socket.storedMessage).not.toHaveBeenCalled();
+    expect(memcached.isKeyStored('foo')).toBe(true);
+    memcached.deleteKeyCache('foo');
+  });
+  test('Cas command ran successfully', () => {
+    const socket = new Socket();
+    const command = 'cas foo 3 3 3 1';
+    const value = 'cas';
+    memcached.createKey(mockData1);
+    runCommand(socket, parseCommand(command), value);
+    expect(socket.writeMessage).not.toHaveBeenCalled();
+    expect(socket.storedMessage).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(cache)).toMatchSnapshot();
+    memcached.deleteKeyCache('foo');
   });
 });
