@@ -46,7 +46,7 @@ Storage commands:
 
 There are a few storage commands that start with a header like this:
 
-      <command> <key> <flags> <exptime> <bytes>\r\n
+    <command> <key> <flags> <exptime> <bytes>\r\n
 
   
 
