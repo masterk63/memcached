@@ -3,9 +3,9 @@
 
 # memcached.js
 
-memcached.js is inspired in memcached server. This implementantion it's just a subset, not include all commands, the commands currently supported are listed bellow.
+memcached.js is inspired in memcached server. This implementation's just a subset, not include all commands, the commands currently supported are listed below.
 
-The server is useful if you want a simple memcached server that integrates with your existing node.js infrastructure; otherwise just use [the original memcached](http://memcached.org/) which is a very lightweight.
+The server is useful if you want a simple memcached server that integrates with your existing node.js infrastructure, otherwise use [the original memcached](http://memcached.org/), which is very lightweight.
 
 ### Usage
 
@@ -129,7 +129,7 @@ the items have been transmitted, the server sends the string
 
 `END\r\n`
 
-to indicate the end of response.
+to indicate the end of a response.
  
 Each item sent by the server looks like this:
 
