@@ -1,6 +1,6 @@
 # memcached.js
 
-memcached.js is inspired in memcached server. This implementation is just a subset from the original, not include all commands, the commands currently supported are listed below.
+memcached.js is inspired in memcached server. This implementation has only a subset of commands from the original. Commands currently support are listed below
 
 The server is useful if you want a simple memcached server that integrates with your existing node.js infrastructure, otherwise use [the original memcached](http://memcached.org/) which is a very lightweight.
 
