@@ -11,12 +11,24 @@ beforeEach(() => {
   Socket.mockClear();
 });
 
+const basicStructure = (command, fun) => {
+  const socket = new Socket();
+  read(`${command}\r\n`, socket);
+  expect(commands.runCommand).not.toHaveBeenCalled();
+  expect(socket[fun]).toHaveBeenCalledTimes(1);
+};
+
 describe('Checking Preconditions', () => {
   test('Command not exist', () => {
-    const socket = new Socket();
-    const command = 'moovit\r\n';
-    read(command, socket);
-    expect(commands.runCommand).not.toHaveBeenCalled();
-    expect(socket.commandNotFound).toHaveBeenCalledTimes(1);
+    basicStructure('moovit', 'commandNotFound');
+  });
+  test('Command with bad number of params', () => {
+    basicStructure('set foo 3 3', 'commandNotFound');
+  });
+  test('Store Command with empty key', () => {
+    basicStructure('set   3 3 3', 'commandNotFound');
+  });
+  test('Store Command not meet correct type', () => {
+    basicStructure('set foo 3 3 hola', 'badCommandLineFormat');
   });
 });
