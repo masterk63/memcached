@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Store Commands Add command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":2}}"`;
+exports[`Running Commands Add command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":2}}"`;
 
-exports[`Store Commands Append command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"saybye\\",\\"flags\\":0,\\"cas\\":4}}"`;
+exports[`Running Commands Append command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"saybye\\",\\"flags\\":0,\\"cas\\":4}}"`;
 
-exports[`Store Commands Cas command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"cas\\",\\"flags\\":3,\\"cas\\":6}}"`;
+exports[`Running Commands Cas command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"cas\\",\\"flags\\":3,\\"cas\\":6}}"`;
 
-exports[`Store Commands Prepend command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"byesay\\",\\"flags\\":0,\\"cas\\":5}}"`;
+exports[`Running Commands Prepend command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"byesay\\",\\"flags\\":0,\\"cas\\":5}}"`;
 
-exports[`Store Commands Replace command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"bye\\",\\"flags\\":3,\\"cas\\":3}}"`;
+exports[`Running Commands Replace command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"bye\\",\\"flags\\":3,\\"cas\\":3}}"`;
 
-exports[`Store Commands Set command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":1}}"`;
+exports[`Running Commands Set command ran successfully 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":3,\\"cas\\":1}}"`;

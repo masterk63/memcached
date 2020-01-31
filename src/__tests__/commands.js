@@ -51,7 +51,7 @@ const getLogicMulti = command => {
   memcached.deleteKeyCache('name');
 }
 
-describe('Store Commands', () => {
+describe('Running Commands', () => {
   test('Set command bad chunk', () => {
     const socket = new Socket();
     const command = 'set foo 3 3 3';
