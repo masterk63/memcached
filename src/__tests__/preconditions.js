@@ -29,6 +29,12 @@ describe('Checking Preconditions', () => {
     basicStructure('set   3 3 3', 'commandNotFound');
   });
   test('Store Command not meet correct type', () => {
-    basicStructure('set foo 3 3 hola', 'badCommandLineFormat');
+    basicStructure('set foo 3 hola 3', 'badCommandLineFormat');
+  });
+  test('Store Command not meet correct type', () => {
+    basicStructure('set foo -3 3 3', 'badCommandLineFormat');
+  });
+  test('Store Command not meet correct type', () => {
+    basicStructure('set foo 3 3 -3', 'badCommandLineFormat');
   });
 });
