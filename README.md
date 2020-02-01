@@ -4,11 +4,19 @@ memcached.js is inspired in memcached server. This implementation has only a sub
 
 The server is useful if you want a simple memcached server that integrates with your existing node.js infrastructure, otherwise use [the original memcached](http://memcached.org/) which is a very lightweight.
 
-### Usage
+## Usage
+
+### Run Server
 
     $ yarn start
 
 memcached.js will run, by default, on port 11211. For a custom port, please set PORT environment variable from console.
+
+### Run client
+
+For test the server you can use any memcached client, otherwise you can connect using telnet running this command. `telnet <ip-address> <port>` e.g:
+
+    $ telnet localhost 11211
 
 ### Server Commands
 
@@ -100,6 +108,30 @@ Each item sent by the server looks like this:
 - `<cas unique>` is a unique 64-bit integer that uniquely identifies this specific item.
 
 - `<data block>` is the data for this item.
+
+#### Store sample command
+
+    set kevin 0 300 0\r\n
+    to-moovitr\r\n
+
+the server responds with `STORED\r\n`.
+
+#### Error sample commands
+
+if you run command not supported, you will recibe `ERROR\r\n`, example command:
+
+    $ store\r\n
+
+If you run a supported command, but with incorrect number of params, you will recibe
+`CLIENT_ERROR bad command line format\r\n`, example command:
+
+    $ add kevin 0 300
+
+## Testing
+
+For execute the test just run:
+
+     $ yarn test
 
 ## References
 
