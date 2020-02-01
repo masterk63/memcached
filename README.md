@@ -129,7 +129,7 @@ If you run a supported command, but with incorrect number of params, you will re
 
 ## Testing
 
-For execute the test just run:
+For execute the tests just run:
 
      $ yarn test
 
