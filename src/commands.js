@@ -16,9 +16,18 @@ const parseCommandValues = command => {
 
 const checkStoreCommand = (command, socket) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
-  if (key === '') return socket.commandNotFound();
-  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) return socket.badCommandLineFormat();
-  if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) return socket.badCommandLineFormat();
+  if (key === '') {
+    socket.commandNotFound();
+    return false;
+  }
+  if (isNaN(flag) || isNaN(exptime) || isNaN(bytes)) {
+    socket.badCommandLineFormat();
+    return false;
+  }
+  if (flag < 0 || flag > maxValueUnsigned16bit || bytes < 0) {
+    socket.badCommandLineFormat();
+    return false;
+  }
   return true;
 };
 
@@ -29,7 +38,8 @@ const isValidCommand = (fullCommand, socket) => {
     if (isRetrievalCommand(commandName) && fullCommand.length > commandsGetLength) return true;
     if (commandName !== CAS && fullCommand.length === commandsAddLength) return checkStoreCommand(fullCommand, socket);
   }
-  return socket.commandNotFound();
+  socket.commandNotFound();
+  return false; 
 };
 
 const getValueMessage = ({ key, flags, value, cas, showCas, socket }) => {
@@ -53,7 +63,10 @@ const gets = (socket, values) => get(socket, values, true);
 //store this data
 const set = (command, value, socket) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
-  if (value.length !== bytes) return socket.badDataChunk();
+  if (value.length !== bytes) {
+    socket.badDataChunk();
+    return false;
+  }
   if(exptime < 0) return socket.storedMessage();
   const data = new Data(key, flag, exptime, value);
   createKey(data);
@@ -64,20 +77,32 @@ const set = (command, value, socket) => {
 // hold data for this key
 const add = (command, value, socket) => {
   const key = command[1];
-  if(isKeyStored(key)) return socket.notStoredMessage();
+  if(isKeyStored(key)) {
+    socket.notStoredMessage();
+    return false;
+  }
   set(command, value, socket);
 };
 
 const replace = (command, value, socket) => {
   const key = command[1];
-  if(!isKeyStored(key)) return socket.notStoredMessage();
+  if(!isKeyStored(key)) {
+    socket.notStoredMessage();
+    return false;
+  }
   set(command, value, socket);
 };
 
 const appendLogic = isAppend  => (command, value, socket) => {
   let [key, _, __, bytes] = parseCommandValues(command);
-  if (value.length !== bytes) return socket.badDataChunk();
-  if(!isKeyStored(key)) return socket.notStoredMessage();
+  if (value.length !== bytes) {
+    socket.badDataChunk();
+    return false;
+  }
+  if(!isKeyStored(key)) {
+    socket.notStoredMessage();
+    return false; 
+  }
   const data = { ...readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
   data.cas = getIncrementCas();

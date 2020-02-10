@@ -15,7 +15,6 @@ class Socket {
   //Means the client sent a nonexistent command name.
   commandNotFound() {
     this.writeMessage('ERROR');
-    return false;
   }
 
   // Means some sort of client error in the input line, i.e. the input
@@ -27,13 +26,11 @@ class Socket {
 
   badCommandLineFormat() {
     this.clientError('bad command line format');
-    return false;
   }
 
   badDataChunk() {
     this.clientError('bad data chunk');
     this.commandNotFound();
-    return false;
   }
 
   storedMessage() {
@@ -42,7 +39,6 @@ class Socket {
 
   notStoredMessage() {
     this.writeMessage('NOT_STORED');
-    return false;
   }
 
   endMessage() {
