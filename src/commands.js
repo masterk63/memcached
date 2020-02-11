@@ -75,10 +75,10 @@ const gets = values => get(values, true);
 
 //store this data
 const set = (command, value) => {
-  let [key, flag, exptime, bytes] = parseCommandValues(command);
+  let [key, flags, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
   if (exptime < 0) return STORED;
-  createKey({ key, flag, exptime, value });
+  createKey({ key, flags, exptime, value });
   return STORED;
 };
 
