@@ -20,6 +20,7 @@ class Command {
   static checkInvalidCommand(fullCommand) {
     const commandName = fullCommand[0];
     const [key, flag, exptime, bytes] = this.parseCommandValues(fullCommand);
+
     if (
       !COMMANDS_NAMES.includes(commandName) ||
       (commandName === CAS && fullCommand.length !== COMMAND_CAS_LENGTH) ||
@@ -28,11 +29,13 @@ class Command {
       (!this.isRetrievalCommand(commandName) && key === '')
     )
       return COMMAND_NOT_FOUND;
+
     if (
       !this.isRetrievalCommand(commandName) &&
       (isNaN(flag) || isNaN(exptime) || isNaN(bytes) || flag < 0 || flag > MAX_VALUES_UNSIGNED_16BIT || bytes < 0)
     )
       return BAD_COMMAND_LINE_FORMAT;
+
   }
 
   static getValueMessage({ key, flags, value, cas, showCas }, messageArray) {
