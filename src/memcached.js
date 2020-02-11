@@ -7,6 +7,10 @@ class Memcached {
     this.cache = {};
   }
 
+  getInstance() {
+    return this.cache;
+  }
+
   createKey(values) {
     const data = new Data({ ...values, cas: cas.getIncrementCas() });
     this.cache[data.key] = data;
@@ -30,4 +34,18 @@ class Memcached {
   }
 }
 
-module.exports = Memcached;
+class Singleton {
+
+  constructor() {
+      if (!Singleton.instance) {
+          Singleton.instance = new Memcached();
+      }
+  }
+
+  getInstance() {
+      return Singleton.instance;
+  }
+
+}
+
+module.exports = Singleton;

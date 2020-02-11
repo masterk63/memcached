@@ -2,7 +2,7 @@ const { RETRIEVAL_COMMANDS, COMMANDS_NAMES, CAS, GET, GETS, SET, ADD, REPLACE, A
 const { COMMAND_CAS_LENGTH, COMMANDS_GET_LENGTH, COMMANDS_ADD_LENGTH, MAX_VALUES_UNSIGNED_16BIT } = require('./constants/commandsValues');
 const { COMMAND_NOT_FOUND, BAD_COMMAND_LINE_FORMAT, END, BAD_DATA_CHUNK, STORED, NOT_STORED, NOT_FOUND, EXISTS } = require('./constants/messages');
 const Memcached = require('./Memcached');
-const memcached = new Memcached();
+const memcached = new Memcached().getInstance();
 
 class Command {
   static isRetrievalCommand(command) {
