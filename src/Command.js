@@ -21,21 +21,23 @@ class Command {
     const commandName = fullCommand[0];
     const [key, flag, exptime, bytes] = this.parseCommandValues(fullCommand);
 
-    if (
-      !COMMANDS_NAMES.includes(commandName) ||
-      (commandName === CAS && fullCommand.length !== COMMAND_CAS_LENGTH) ||
-      (this.isRetrievalCommand(commandName) && fullCommand.length < COMMANDS_GET_LENGTH) ||
-      (!this.isRetrievalCommand(commandName) && commandName !== CAS && fullCommand.length !== COMMANDS_ADD_LENGTH) ||
-      (!this.isRetrievalCommand(commandName) && key === '')
-    )
+    const commandExists = !COMMANDS_NAMES.includes(commandName);
+    const checkCASLength = commandName === CAS && fullCommand.length !== COMMAND_CAS_LENGTH;
+    const checkRetrivalLength = this.isRetrievalCommand(commandName) && fullCommand.length < COMMANDS_GET_LENGTH;
+    const checkStoreLength = !this.isRetrievalCommand(commandName) && commandName !== CAS && fullCommand.length !== COMMANDS_ADD_LENGTH;
+    const checkKeyExists = !this.isRetrievalCommand(commandName) && key === '';
+
+    if (commandExists || checkCASLength || checkRetrivalLength || checkStoreLength || checkKeyExists) {
       return COMMAND_NOT_FOUND;
+    }
 
-    if (
-      !this.isRetrievalCommand(commandName) &&
-      (isNaN(flag) || isNaN(exptime) || isNaN(bytes) || flag < 0 || flag > MAX_VALUES_UNSIGNED_16BIT || bytes < 0)
-    )
+    const checkValuesTypes = isNaN(flag) || isNaN(exptime) || isNaN(bytes);
+    const checkFlagConditions = flag < 0 || flag > MAX_VALUES_UNSIGNED_16BIT;
+    const checkBytesLength = bytes < 0;
+
+    if ((!this.isRetrievalCommand(commandName) && checkValuesTypes) || checkFlagConditions || checkBytesLength) {
       return BAD_COMMAND_LINE_FORMAT;
-
+    }
   }
 
   static getValueMessage({ key, flags, value, cas, showCas }, messageArray) {

@@ -1,5 +1,5 @@
-const Command = require('../Commands');
-const Memcached = require('../Memcached');
+const Command = require('../Command');
+const Memcached = require('../models/Memcached');
 const memcached = new Memcached().getInstance();
 const { STORED, BAD_DATA_CHUNK, COMMAND_NOT_FOUND } = require('../constants/messages');
 

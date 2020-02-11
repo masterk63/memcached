@@ -1,9 +1,9 @@
 const Parser = require('../Parser');
 const parser = new Parser();
-const Commands = require('../Commands');
+const Commands = require('../Command');
 const { COMMAND_NOT_FOUND, BAD_COMMAND_LINE_FORMAT } = require('../constants/messages');
-jest.mock('../Commands', function() {
-  const mockRealCommand = jest.requireActual('../Commands');
+jest.mock('../Command', function() {
+  const mockRealCommand = jest.requireActual('../Command');
   jest.spyOn(mockRealCommand, 'runCommand');
   return mockRealCommand;
 });
