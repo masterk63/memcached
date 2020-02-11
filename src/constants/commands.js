@@ -6,12 +6,22 @@ const REPLACE = 'replace';
 const APPEND = 'append';
 const PREPREND = 'prepend';
 const CAS = 'cas';
-const commandNames = [GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS];
-const retrievalCommand = [GET, GETS];
-const commandCasLength = 6;
-const commandsAddLength = 5;
-const commandsGetLength = 1;
-const maxValueUnsigned16bit = 65535;
+const COMMANDS_NAMES = [GET, GETS, SET, ADD, REPLACE, APPEND, PREPREND, CAS];
+const RETRIEVAL_COMMANDS = [GET, GETS];
+const COMMAND_CAS_LENGTH = 6;
+const COMMANDS_ADD_LENGTH = 5;
+const COMMANDS_GET_LENGTH = 1;
+const MAX_VALUES_UNSIGNED_16BIT = 65535;
+const COMMAND_NOT_FOUND = 'ERROR';
+const STORED = 'STORED';
+const END = 'END';
+const EXISTS = 'EXISTS';
+const NOT_FOUND = 'NOT_FOUND';
+const NOT_STORED = 'NOT_STORED';
+const CLIENT_ERROR = 'CLIENT_ERROR';
+const BAD_COMMAND_LINE_FORMAT = `${CLIENT_ERROR} bad command line format`;
+const BAD_DATA_CHUNK = `${CLIENT_ERROR} bad data chunk`;
+const LINE_BREAK = '\r\n';
 
 module.exports = {
   GET,
@@ -22,10 +32,19 @@ module.exports = {
   APPEND,
   PREPREND,
   CAS,
-  commandNames,
-  retrievalCommand,
-  commandCasLength,
-  commandsAddLength,
-  commandsGetLength,
-  maxValueUnsigned16bit
+  COMMAND_NOT_FOUND,
+  NOT_STORED,
+  NOT_FOUND,
+  STORED,
+  END,
+  EXISTS,
+  COMMANDS_NAMES,
+  RETRIEVAL_COMMANDS,
+  COMMAND_CAS_LENGTH,
+  BAD_COMMAND_LINE_FORMAT,
+  LINE_BREAK,
+  BAD_DATA_CHUNK,
+  COMMANDS_ADD_LENGTH,
+  COMMANDS_GET_LENGTH,
+  MAX_VALUES_UNSIGNED_16BIT
 };

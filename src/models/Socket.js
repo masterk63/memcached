@@ -1,48 +1,17 @@
-class Socket {
+const { LINE_BREAK } = require('../constants/commands');
 
+class Socket {
   constructor(socket) {
     this.socket = socket;
   }
 
-	getInstance() {
-		return this.socket;
-	}
-
-  writeMessage(message) {
-    this.socket.write(`${message}\r\n`);
+  getInstance() {
+    return this.socket;
   }
 
-  //Means the client sent a nonexistent command name.
-  commandNotFound() {
-    this.writeMessage('ERROR');
-  }
-
-  // Means some sort of client error in the input line, i.e. the input
-  // doesn't conform to the protocol in some way. <error> is a
-  // human-readable error string.
-  clientError(message) {
-    this.writeMessage(`CLIENT_ERROR ${message}`);
-  }
-
-  badCommandLineFormat() {
-    this.clientError('bad command line format');
-  }
-
-  badDataChunk() {
-    this.clientError('bad data chunk');
-    this.commandNotFound();
-  }
-
-  storedMessage() {
-    this.writeMessage('STORED');
-  }
-
-  notStoredMessage() {
-    this.writeMessage('NOT_STORED');
-  }
-
-  endMessage() {
-    this.writeMessage('END');
+  writeMessage(msg) {
+    const messages = Array.isArray(msg) ? msg : [msg];
+    messages.map(message => this.socket.write(`${message}${LINE_BREAK}`));
   }
 
   getCurrentUser() {
