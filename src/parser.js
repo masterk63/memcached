@@ -1,6 +1,6 @@
 const { LINE_BREAK } = require('./constants/app');
 const { BAD_DATA_CHUNK, COMMAND_NOT_FOUND } = require('./constants/messages');
-const Command = require('./Commands');
+const Command = require('./Command');
 
 class Parser {
   constructor() {

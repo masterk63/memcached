@@ -1,5 +1,5 @@
-const Data = require('./models/Data');
-const Cas = require('./models/Cas');
+const Data = require('./Data');
+const Cas = require('./Cas');
 const cas = new Cas();
 
 class Memcached {
@@ -35,17 +35,15 @@ class Memcached {
 }
 
 class Singleton {
-
   constructor() {
-      if (!Singleton.instance) {
-          Singleton.instance = new Memcached();
-      }
+    if (!Singleton.instance) {
+      Singleton.instance = new Memcached();
+    }
   }
 
   getInstance() {
-      return Singleton.instance;
+    return Singleton.instance;
   }
-
 }
 
 module.exports = Singleton;
