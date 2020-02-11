@@ -1,6 +1,7 @@
 const net = require('net');
 const Socket = require('./src/models/Socket');
-const parser = require('./src/parser');
+const Parser = require('./src/parser');
+const parser = new Parser();
 const PORT = process.env.PORT || 11211;
 
 const handleSocket = skt => {

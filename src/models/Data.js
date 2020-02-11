@@ -2,8 +2,7 @@ const SECOND = 1000;
 
 class Data {
   constructor({ key, flags, exptime, value, cas }) {
-    const Command = require('./Commands');
-    const command = new Command();
+    const Command = require('../Commands');
     this.key = key;
     this.value = value;
     this.flags = flags;
@@ -11,7 +10,7 @@ class Data {
     //if exptime = 0 the key never expire
     if (exptime > 0) {
       setTimeout(() => {
-        command.deleteKey(key);
+        Command.deleteKey(key);
       }, exptime * SECOND);
     }
   }

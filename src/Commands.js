@@ -1,4 +1,3 @@
-//@ts-check
 const {
   GET,
   GETS,
@@ -22,16 +21,16 @@ const {
   MAX_VALUES_UNSIGNED_16BIT,
   BAD_COMMAND_LINE_FORMAT,
   COMMAND_NOT_FOUND
-} = require('../constants/commands');
-const Memcached = require('../memcached');
+} = require('./constants/commands');
+const Memcached = require('./Memcached');
 const memcached = new Memcached();
 
 class Command {
-  isRetrievalCommand(command) {
+  static isRetrievalCommand(command) {
     return RETRIEVAL_COMMANDS.includes(command);
   }
 
-  parseCommandValues(command) {
+  static parseCommandValues(command) {
     let [_, key, flag, exptime, bytes] = command;
     flag = parseInt(flag);
     exptime = parseInt(exptime);
@@ -39,7 +38,7 @@ class Command {
     return [key, flag, exptime, bytes];
   }
 
-  checkInvalidCommand(fullCommand) {
+  static checkInvalidCommand(fullCommand) {
     const commandName = fullCommand[0];
     const [key, flag, exptime, bytes] = this.parseCommandValues(fullCommand);
     if (
@@ -57,14 +56,14 @@ class Command {
       return BAD_COMMAND_LINE_FORMAT;
   }
 
-  getValueMessage({ key, flags, value, cas, showCas }, messageArray) {
+  static getValueMessage({ key, flags, value, cas, showCas }, messageArray) {
     let message = `VALUE ${key} ${flags} ${value.length}`;
     if (showCas) message += ` ${cas}`;
     messageArray.push(message);
     messageArray.push(`${value}`);
   }
 
-  get(values, showCas = false) {
+  static get(values, showCas = false) {
     const message = [];
     values.shift();
     values.forEach(value => {
@@ -75,12 +74,12 @@ class Command {
     return message;
   }
 
-  gets(values) {
+  static gets(values) {
     return this.get(values, true);
   }
 
   //store this data
-  set(command, value) {
+  static set(command, value) {
     let [key, flags, exptime, bytes] = this.parseCommandValues(command);
     if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
     if (exptime < 0) return STORED;
@@ -90,19 +89,19 @@ class Command {
 
   // store this data, but only if the server *doesn't* already
   // hold data for this key
-  add(command, value) {
+  static add(command, value) {
     const key = command[1];
     if (memcached.isKeyStored(key)) return NOT_STORED;
     return this.set(command, value);
   }
 
-  replace(command, value) {
+  static replace(command, value) {
     const key = command[1];
     if (!memcached.isKeyStored(key)) return NOT_STORED;
     return this.set(command, value);
   }
 
-  appendLogic(isAppend, command, value) {
+  static appendLogic(isAppend, command, value) {
     let [key, _, __, bytes] = this.parseCommandValues(command);
     if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
     if (!memcached.isKeyStored(key)) return NOT_STORED;
@@ -112,15 +111,15 @@ class Command {
     return STORED;
   }
 
-  append(command, value) {
+  static append(command, value) {
     return this.appendLogic(true, command, value);
   }
 
-  prepend(command, value) {
+  static prepend(command, value) {
     return this.appendLogic(false, command, value);
   }
 
-  cas(command, value) {
+  static cas(command, value) {
     const key = command[1];
     const userCas = parseInt(command[5]);
     if (!memcached.isKeyStored(key)) return NOT_FOUND;
@@ -129,11 +128,11 @@ class Command {
     return this.set(command, value);
   }
 
-  deleteKey(key) {
+  static deleteKey(key) {
     memcached.deleteKeyCache(key);
   }
 
-  runCommand(command, value) {
+  static runCommand(command, value) {
     const commandName = command[0];
     switch (commandName) {
       case GET:

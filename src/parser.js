@@ -1,46 +1,51 @@
-//@ts-check
-const Command = require('./models/Commands');
-const command = new Command();
+const Command = require('./Commands');
 const { BAD_DATA_CHUNK, COMMAND_NOT_FOUND, LINE_BREAK } = require('./constants/commands');
 
-let textChunk = '';
-let storeCommand = '';
+class Parser {
+  constructor() {
+    this.textChunk = '';
+    this.storeCommand = '';
+  }
 
-const enterPressed = () => textChunk.includes(LINE_BREAK);
+  enterPressed() {
+    return this.textChunk.includes(LINE_BREAK);
+  }
 
-const parseCommand = () =>
-  textChunk
-    .replace(LINE_BREAK, '')
-    .toLowerCase()
-    .split(' ');
+  parseCommand() {
+    return this.textChunk
+      .replace(LINE_BREAK, '')
+      .toLowerCase()
+      .split(' ');
+  }
 
-const read = data => {
-  textChunk += data.toString('utf8');
-  if (enterPressed()) {
-    if (!storeCommand) {
-      const commandParsed = parseCommand();
-      textChunk = '';
-      const isInvalidCommand = command.checkInvalidCommand(commandParsed);
-      if(isInvalidCommand) return isInvalidCommand;
-      if (command.isRetrievalCommand(commandParsed[0])) {
-        return command.runCommand(commandParsed);
+  read(data) {
+    this.textChunk += data.toString('utf8');
+    if (this.enterPressed()) {
+      if (!this.storeCommand) {
+        const commandParsed = this.parseCommand();
+        this.textChunk = '';
+        const isInvalidCommand = Command.checkInvalidCommand(commandParsed);
+        if (isInvalidCommand) return isInvalidCommand;
+        if (Command.isRetrievalCommand(commandParsed[0])) {
+          return Command.runCommand(commandParsed);
+        } else {
+          this.storeCommand = commandParsed;
+        }
       } else {
-        storeCommand = commandParsed;
+        const commandParsed = this.parseCommand();
+        let result;
+        if (commandParsed.length === 1) {
+          const value = commandParsed[0];
+          result = Command.runCommand(this.storeCommand, value);
+        } else {
+          result = [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
+        }
+        this.storeCommand = '';
+        this.textChunk = '';
+        return result;
       }
-    } else {
-      const commandParsed = parseCommand();
-      let result;
-      if (commandParsed.length === 1) {
-        const value = commandParsed[0];
-        result = command.runCommand(storeCommand, value);
-      } else {
-        result = [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
-      }
-      storeCommand = '';
-      textChunk = '';
-      return result;
     }
   }
-};
+}
 
-module.exports = { read };
+module.exports = Parser;
