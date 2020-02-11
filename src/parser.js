@@ -28,7 +28,7 @@ class Parser {
         const isInvalidCommand = Command.checkInvalidCommand(commandParsed);
         if (isInvalidCommand) return isInvalidCommand;
         if (Command.isRetrievalCommand(commandParsed[0])) {
-          return Command.runCommand(commandParsed);
+          return Command.run(commandParsed);
         } else {
           this.storeCommand = commandParsed;
         }
@@ -37,7 +37,7 @@ class Parser {
         let result;
         if (commandParsed.length === 1) {
           const value = commandParsed[0];
-          result = Command.runCommand(this.storeCommand, value);
+          result = Command.run(this.storeCommand, value);
         } else {
           result = [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
         }

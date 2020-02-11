@@ -116,7 +116,7 @@ class Command {
     memcached.deleteKeyCache(key);
   }
 
-  static runCommand(command, value) {
+  static run(command, value) {
     const commandName = command[0];
     switch (commandName) {
       case GET:

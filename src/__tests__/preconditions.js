@@ -4,13 +4,13 @@ const Commands = require('../Command');
 const { COMMAND_NOT_FOUND, BAD_COMMAND_LINE_FORMAT } = require('../constants/messages');
 jest.mock('../Command', function() {
   const mockRealCommand = jest.requireActual('../Command');
-  jest.spyOn(mockRealCommand, 'runCommand');
+  jest.spyOn(mockRealCommand, 'run');
   return mockRealCommand;
 });
 
 const basicStructure = (command, result) => {
   const response = parser.read(`${command}\r\n`);
-  expect(Commands.runCommand).not.toHaveBeenCalled();
+  expect(Commands.run).not.toHaveBeenCalled();
   expect(response).toBe(result);
 };
 

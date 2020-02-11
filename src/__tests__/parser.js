@@ -15,4 +15,9 @@ describe('Parser', () => {
     expect(response).toBeUndefined();
     expect(parser.storeCommand).toEqual(['set', 'foo', '0', '300', '3']);
   });
+  test('Read line when enter pressed', () => {
+    const message = `hola${LINE_BREAK}`;
+    const response = parser.read(message);
+    expect(response).not.toBeNull();
+  });
 });

@@ -22,7 +22,7 @@ const mockData2 = {
 const appendLogic = command => {
   const value = 'bye';
   memcached.createKey(mockData1);
-  const result = Command.runCommand(parseCommand(command), value);
+  const result = Command.run(parseCommand(command), value);
   expect(result).toBe(STORED);
   expect(JSON.stringify(memcached.getInstance())).toMatchSnapshot();
   memcached.deleteKeyCache('foo');
@@ -31,7 +31,7 @@ const appendLogic = command => {
 const getLogicMulti = command => {
   memcached.createKey(mockData1);
   memcached.createKey(mockData2);
-  const result = Command.runCommand(parseCommand(command));
+  const result = Command.run(parseCommand(command));
   expect(result).toEqual(['VALUE foo 0 3', 'say', 'VALUE name 0 5', 'kevin', END]);
   memcached.deleteKeyCache('foo');
   memcached.deleteKeyCache('name');
@@ -41,14 +41,14 @@ describe('Running Commands', () => {
   test('Set command bad chunk', () => {
     const command = 'set foo 3 3 3';
     const value = 'done';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toEqual([BAD_DATA_CHUNK, COMMAND_NOT_FOUND]);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
   test('Set command ran successfully', () => {
     const command = 'set foo 3 3 3';
     const value = 'say';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(STORED);
     expect(JSON.stringify(memcached.getInstance())).toMatchSnapshot();
     memcached.deleteKeyCache('foo');
@@ -56,14 +56,14 @@ describe('Running Commands', () => {
   test('Set command with exptime -1 (auto delete)', () => {
     const command = 'set foo 3 -1 3';
     const value = 'say';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(STORED);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
   test('Add command ran successfully', () => {
     const command = 'add foo 3 3 3';
     const value = 'say';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(STORED);
     expect(JSON.stringify(memcached.getInstance())).toMatchSnapshot();
     memcached.deleteKeyCache('foo');
@@ -72,7 +72,7 @@ describe('Running Commands', () => {
     const command = 'add foo 3 3 3';
     const value = 'say';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(NOT_STORED);
     memcached.deleteKeyCache('foo');
   });
@@ -80,7 +80,7 @@ describe('Running Commands', () => {
     const command = 'replace foo 3 3 3';
     const value = 'bye';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(STORED);
     expect(JSON.stringify(memcached.getInstance())).toMatchSnapshot();
     memcached.deleteKeyCache('foo');
@@ -88,21 +88,21 @@ describe('Running Commands', () => {
   test('Replace command not stored', () => {
     const command = 'replace foo 3 3 3';
     const value = 'bye';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(NOT_STORED);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
   test('Append command not stored', () => {
     const command = 'append foo 3 3 3';
     const value = 'bye';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(NOT_STORED);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
   test('Append command bad data chunk', () => {
     const command = 'append foo 3 3 3';
     const value = 'byee';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toEqual([BAD_DATA_CHUNK, COMMAND_NOT_FOUND]);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
@@ -117,7 +117,7 @@ describe('Running Commands', () => {
   test('Cas command not found', () => {
     const command = 'cas foo 3 3 3 3';
     const value = 'bye';
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(NOT_FOUND);
     expect(memcached.isKeyStored('foo')).toBe(false);
   });
@@ -125,7 +125,7 @@ describe('Running Commands', () => {
     const command = 'cas foo 3 3 3 3';
     const value = 'bye';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(EXISTS);
     expect(memcached.isKeyStored('foo')).toBe(true);
     memcached.deleteKeyCache('foo');
@@ -134,20 +134,20 @@ describe('Running Commands', () => {
     const command = 'cas foo 3 3 3 11';
     const value = 'cas';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command), value);
+    const result = Command.run(parseCommand(command), value);
     expect(result).toBe(STORED);
     expect(JSON.stringify(memcached.getInstance())).toMatchSnapshot();
     memcached.deleteKeyCache('foo');
   });
   test('Get command key not found', () => {
     const command = 'get hola';
-    const result = Command.runCommand(parseCommand(command));
+    const result = Command.run(parseCommand(command));
     expect(result).toEqual([END]);
   });
   test('Get command ran successfully with 1 param', () => {
     const command = 'get foo';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command));
+    const result = Command.run(parseCommand(command));
     expect(result).toEqual(['VALUE foo 0 3', 'say', END]);
     memcached.deleteKeyCache('foo');
   });
@@ -162,7 +162,7 @@ describe('Running Commands', () => {
   test('Gets command ran successfully with 1 param', () => {
     const command = 'gets foo';
     memcached.createKey(mockData1);
-    const result = Command.runCommand(parseCommand(command));
+    const result = Command.run(parseCommand(command));
     expect(result).toEqual(['VALUE foo 0 3 18', 'say', END]);
     memcached.deleteKeyCache('foo');
   });
