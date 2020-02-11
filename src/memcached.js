@@ -1,5 +1,6 @@
 const Data = require('./models/Data');
-const { getIncrementCas } = require('./cas');
+const Cas = require('./models/Cas');
+const cas = new Cas();
 
 class Memcached {
   constructor() {
@@ -7,7 +8,7 @@ class Memcached {
   }
 
   createKey(values) {
-    const data = new Data(values);
+    const data = new Data({ ...values, cas: cas.getIncrementCas() });
     this.cache[data.key] = data;
   }
 
@@ -16,7 +17,7 @@ class Memcached {
   }
 
   updateKey(data) {
-    data.cas = getIncrementCas();
+    data.cas = cas.getIncrementCas();
     this.cache[data.key] = data;
   }
 
