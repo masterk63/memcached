@@ -24,8 +24,6 @@ const {
   COMMAND_NOT_FOUND
 } = require('./constants/commands');
 const { createKey, deleteKeyCache, isKeyStored, readKey, updateKey } = require('./memcached');
-const { getIncrementCas } = require('./cas');
-const Data = require('./models/Data');
 
 const isRetrievalCommand = command => RETRIEVAL_COMMANDS.includes(command);
 
@@ -80,8 +78,7 @@ const set = (command, value) => {
   let [key, flag, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
   if (exptime < 0) return STORED;
-  const data = new Data(key, flag, exptime, value);
-  createKey(data);
+  createKey({ key, flag, exptime, value });
   return STORED;
 };
 
@@ -105,7 +102,6 @@ const appendLogic = isAppend => (command, value) => {
   if (!isKeyStored(key)) return NOT_STORED;
   const data = { ...readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
-  data.cas = getIncrementCas();
   updateKey(data);
   return STORED;
 };

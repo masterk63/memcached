@@ -1,12 +1,21 @@
+const Data = require('./models/Data');
+const { getIncrementCas } = require('./cas');
+
 const cache = {};
 
 const getMemcachedInstance = () => cache;
 
-const createKey = data => cache[data.key] = data;
+const createKey = values => {
+  const data = new Data(values);
+  cache[data.key] = data;
+};
 
 const readKey = key => cache[key];
 
-const updateKey = data => cache[data.key] = data;
+const updateKey = data => {
+  data.cas = getIncrementCas();
+  cache[data.key] = data;
+};
 
 const deleteKeyCache = key => delete cache[key];
 
@@ -19,5 +28,4 @@ module.exports = {
   updateKey,
   isKeyStored,
   deleteKeyCache
-}
-
+};

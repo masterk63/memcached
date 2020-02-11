@@ -2,7 +2,7 @@ const { getIncrementCas } = require('../cas');
 const SECOND = 1000;
 
 class Data {
-  constructor(key, flags, exptime, value) {
+  constructor({ key, flags, exptime, value }) {
     const { deleteKey } = require('../commands');
     this.key = key;
     this.value = value;
