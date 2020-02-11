@@ -1,4 +1,4 @@
-const SECOND = 1000;
+const { SECOND } = require('../constants/app');
 
 class Data {
   constructor({ key, flags, exptime, value, cas }) {

@@ -1,4 +1,4 @@
-const { LINE_BREAK } = require('../constants/commands');
+const { LINE_BREAK } = require('../constants/app');
 
 class Socket {
   constructor(socket) {
