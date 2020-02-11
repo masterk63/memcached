@@ -20,7 +20,7 @@ class Parser {
   }
 
   read(data) {
-    this.textChunk += data.toString('utf8');
+    this.textChunk += data;
     if (this.enterPressed()) {
       if (!this.storeCommand) {
         const commandParsed = this.parseCommand();

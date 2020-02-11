@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 11211;
 
 const handleSocket = skt => {
   const socket = new Socket(skt);
+  socket.getInstance().setEncoding('utf8');
   socket.getInstance().on('data', data => {
     const response = parser.read(data);
     if(response) socket.writeMessage(response);
