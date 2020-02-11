@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Memcached logic Create key 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":0,\\"cas\\":1}}"`;
+
+exports[`Memcached logic Delete key 1`] = `"{}"`;
+
+exports[`Memcached logic Read key 1`] = `"{\\"key\\":\\"foo\\",\\"value\\":\\"say\\",\\"flags\\":0,\\"cas\\":2}"`;
+
+exports[`Memcached logic UpdateKey key 1`] = `"{\\"foo\\":{\\"key\\":\\"foo\\",\\"value\\":\\"kevin\\",\\"exptime\\":300,\\"flags\\":0,\\"cas\\":4}}"`;

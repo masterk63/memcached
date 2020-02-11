@@ -8,7 +8,7 @@ describe('Socket', () => {
     socketInstance.getInstance().write = jest.fn();
     socketInstance.writeMessage(MESSAGE);
     expect(socketInstance.getInstance().write).toHaveBeenCalledWith(`${MESSAGE}${LINE_BREAK}`);
-    expect(socketInstance.getInstance().write).tohavebeencalledtimes(1);
+    expect(socketInstance.getInstance().write).toHaveBeenCalledTimes(1);
   });
   test('Check Socket Write Calls Two Times', () => {
     const MESSAGE = ['say', 'hi'];
