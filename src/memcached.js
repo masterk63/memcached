@@ -1,31 +1,32 @@
 const Data = require('./models/Data');
 const { getIncrementCas } = require('./cas');
 
-const cache = {};
+class Memcached {
+  constructor() {
+    this.cache = {};
+  }
 
-const getMemcachedInstance = () => cache;
+  createKey(values) {
+    const data = new Data(values);
+    this.cache[data.key] = data;
+  }
 
-const createKey = values => {
-  const data = new Data(values);
-  cache[data.key] = data;
-};
+  readKey(key) {
+    return this.cache[key];
+  }
 
-const readKey = key => cache[key];
+  updateKey(data) {
+    data.cas = getIncrementCas();
+    this.cache[data.key] = data;
+  }
 
-const updateKey = data => {
-  data.cas = getIncrementCas();
-  cache[data.key] = data;
-};
+  deleteKeyCache(key) {
+    delete this.cache[key];
+  }
 
-const deleteKeyCache = key => delete cache[key];
+  isKeyStored(key) {
+    return Boolean(this.cache[key]);
+  }
+}
 
-const isKeyStored = key => Boolean(cache[key]);
-
-module.exports = {
-  getMemcachedInstance,
-  createKey,
-  readKey,
-  updateKey,
-  isKeyStored,
-  deleteKeyCache
-};
+module.exports = Memcached;

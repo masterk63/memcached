@@ -23,7 +23,8 @@ const {
   BAD_COMMAND_LINE_FORMAT,
   COMMAND_NOT_FOUND
 } = require('./constants/commands');
-const { createKey, deleteKeyCache, isKeyStored, readKey, updateKey } = require('./memcached');
+const Memcached = require('./memcached');
+const memcached = new Memcached();
 
 const isRetrievalCommand = command => RETRIEVAL_COMMANDS.includes(command);
 
@@ -64,7 +65,7 @@ const get = (values, showCas = false) => {
   const message = [];
   values.shift();
   values.forEach(value => {
-    const storedValue = readKey(value);
+    const storedValue = memcached.readKey(value);
     if (storedValue) getValueMessage({ ...storedValue, showCas }, message);
   });
   message.push(END);
@@ -78,7 +79,7 @@ const set = (command, value) => {
   let [key, flags, exptime, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
   if (exptime < 0) return STORED;
-  createKey({ key, flags, exptime, value });
+  memcached.createKey({ key, flags, exptime, value });
   return STORED;
 };
 
@@ -86,23 +87,23 @@ const set = (command, value) => {
 // hold data for this key
 const add = (command, value) => {
   const key = command[1];
-  if (isKeyStored(key)) return NOT_STORED;
+  if (memcached.isKeyStored(key)) return NOT_STORED;
   return set(command, value);
 };
 
 const replace = (command, value) => {
   const key = command[1];
-  if (!isKeyStored(key)) return NOT_STORED;
+  if (!memcached.isKeyStored(key)) return NOT_STORED;
   return set(command, value);
 };
 
 const appendLogic = isAppend => (command, value) => {
   let [key, _, __, bytes] = parseCommandValues(command);
   if (value.length !== bytes) return [BAD_DATA_CHUNK, COMMAND_NOT_FOUND];
-  if (!isKeyStored(key)) return NOT_STORED;
-  const data = { ...readKey(key) };
+  if (!memcached.isKeyStored(key)) return NOT_STORED;
+  const data = { ...memcached.readKey(key) };
   data.value = isAppend ? `${data.value}${value}` : `${value}${data.value}`;
-  updateKey(data);
+  memcached.updateKey(data);
   return STORED;
 };
 
@@ -113,13 +114,13 @@ const prepend = appendLogic(false);
 const cas = (command, value) => {
   const key = command[1];
   const userCas = parseInt(command[5]);
-  if (!isKeyStored(key)) return NOT_FOUND;
-  const data = readKey(key);
+  if (!memcached.isKeyStored(key)) return NOT_FOUND;
+  const data = memcached.readKey(key);
   if (data.cas !== userCas) return EXISTS;
   return set(command, value);
 };
 
-const deleteKey = key => deleteKeyCache(key);
+const deleteKey = key => memcached.deleteKeyCache(key);
 
 const runCommand = (command, value) => {
   const commandName = command[0];
